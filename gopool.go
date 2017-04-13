@@ -22,7 +22,7 @@ func (this *Worker) Init(f interface{}, maxPool int) {
 	this.pool = make(chan int, maxPool)
 }
 
-func (this *Worker) Add(params ...interface{}) {
+func (this *Worker) Push(params ...interface{}) {
 	paramList := make([]reflect.Value, 0)
 	for _, p := range params {
 		paramList = append(paramList, reflect.ValueOf(p))
@@ -42,7 +42,7 @@ func (this *Worker) run() {
 	}
 }
 
-func (this *Worker) Run() {
+func (this *Worker) Start() {
 	go this.run()
 	for _, params := range this.paramsList {
 		this.pool <- 1
