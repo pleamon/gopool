@@ -19,7 +19,9 @@ func (this *Worker) Init(f interface{}, maxPool int) {
 	this.f = reflect.ValueOf(f)
 	this.MaxPool = maxPool
 	this.paramsChan = make(chan []reflect.Value)
-	this.pool = make(chan int, maxPool)
+	if maxPool > 0 {
+		this.pool = make(chan int, maxPool)
+	}
 }
 
 func (this *Worker) Push(params ...interface{}) {
@@ -37,7 +39,9 @@ func (this *Worker) run() {
 		go func(params []reflect.Value) {
 			defer this.wg.Done()
 			this.f.Call(params)
-			<-this.pool
+			if this.MaxPool > 0 {
+				<-this.pool
+			}
 		}(params)
 	}
 }
@@ -45,7 +49,9 @@ func (this *Worker) run() {
 func (this *Worker) Start() {
 	go this.run()
 	for _, params := range this.paramsList {
-		this.pool <- 1
+		if this.MaxPool > 0 {
+			this.pool <- 1
+		}
 		this.paramsChan <- params
 	}
 	close(this.paramsChan)
