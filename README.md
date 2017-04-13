@@ -1,6 +1,6 @@
 Example:
 
-```
+```golang
 import (
     "github.com/pleamon/gopool"
     "log"
